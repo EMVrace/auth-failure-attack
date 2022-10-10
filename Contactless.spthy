@@ -356,7 +356,9 @@ rule Terminal_Sends_GenerateAC_NoCDA:
     [ Terminal_Ready_For_Cryptogram($Terminal, ~PAN, $Bank, $CA, PDOL,
         AIP, pubkBank, pubkCard, CVM, encPIN, supportedCVM),
       In(acType) ]//let the adversary choose
-  --[ TerminalRequestsNoCDA()/*NEq(fst(AIP), 'CDA')*/ ]->
+  --[ /*NEq(fst(AIP), 'CDA')*/
+      TerminalRequestsNoCDA(),
+      ACType(acType) ]->
     [ Out(< 'GENERATE_AC', acType, 'NoCDA', CDOL1 >),
       Terminal_Sent_GenerateAC_NoCDA($Terminal, ~PAN, $Bank, $CA,
         X, AIP, pubkBank, pubkCard, CVM, encPIN, acType, supportedCVM) ]
@@ -930,7 +932,7 @@ lemma executable:
   exists-trace
   "Ex Bank PAN t #i #j #k #l #m #p #q.
     CardSupportsCVM(PAN, 'OnlinePIN')@m &
-    TerminalRequestsNoCDA()@p &
+    TerminalRequestsNoCDA()@p & ACType('ARQC')@p &
     CardDoesntDoCDA()@q &
     i < j & //Card-Terminal agreement
     Running(PAN, 'Terminal', <'Card', 'Terminal', t>)@i &
